@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Бухгалтерия YSD</title><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#5b5bf0"><link rel="apple-touch-icon" href="icon-192.png"><link rel="icon" href="icon-192.png">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f3f4fb;--card:#fff;--tx:#161a2b;--mut:#7a8199;--bd:#e8eaf4;--ac:#5b5bf0;--ac2:#8b5cf6;--ok:#12a150;--bad:#e5484d;--soft:#f3f4fb;--sh:0 1px 2px rgba(22,26,43,.04),0 8px 24px rgba(22,26,43,.06)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1117;--card:#181b25;--tx:#eef0f7;--mut:#8f97ae;--bd:#262a38;--ac:#7c7cff;--ac2:#a78bfa;--ok:#3ddc84;--bad:#ff6b70;--soft:#202433;--sh:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.3)}}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding:14px 20px;background:color-mix(in srgb,var(--bg) 80%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--bd)}
+h1{font-size:18px;margin:0;font-weight:700;display:flex;align-items:center;gap:10px;letter-spacing:-.2px}
+h1 i{font-style:normal;display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;font-size:17px}
+h2{font-size:22px;margin:0 0 4px;font-weight:700;letter-spacing:-.4px}
+.layout{display:flex;max-width:1240px;margin:0 auto;align-items:flex-start}
+main{flex:1;min-width:0;max-width:900px;margin:0 auto;padding:20px 16px 40px}
+aside{width:280px;flex:none;position:sticky;top:calc(env(safe-area-inset-top,0px) + 70px);max-height:calc(100vh - 90px);overflow-y:auto;padding:20px 0 20px 16px}
+.sbox{margin:0;padding:12px;display:flex;flex-direction:column;min-height:calc(100vh - 130px)}
+.sh{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--mut);padding:6px 12px}
+.nv{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-radius:12px;cursor:pointer;font-weight:600;font-size:14px;transition:.15s}
+.nv span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nv:hover{background:var(--soft)}.nv small{opacity:.65;font-weight:500}
+.nv.on{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff}
+.nv.sub{margin-left:16px;font-weight:500;color:var(--mut);padding:8px 12px}.nv.sub.on{color:#fff}
+.sum{margin:10px 4px 4px;padding-top:12px;border-top:1px solid var(--bd);font-size:13px;color:var(--mut);display:grid;gap:4px}.sum b{color:var(--tx)}
+.bg{display:none;padding:8px 12px}.scrim{display:none}
+@media (max-width:820px){
+.bg{display:inline-block}
+aside{position:fixed;left:0;top:0;bottom:0;max-height:none;width:290px;padding:calc(env(safe-area-inset-top,0px) + 12px) 12px 12px;background:var(--bg);z-index:15;transform:translateX(-105%);transition:transform .25s}
+body.open aside{transform:none}
+.sbox{min-height:calc(100dvh - 24px - env(safe-area-inset-top,0px))}
+body.open .scrim{display:block;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:14}}
+button,input{font:inherit;color:var(--tx)}
+input{background:var(--soft);border:1.5px solid transparent;border-radius:12px;padding:11px 14px;min-width:0;outline:0;transition:.15s}
+input:focus{border-color:var(--ac);background:var(--card)}
+button{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px 16px;cursor:pointer;font-weight:600;transition:.15s}
+button:hover{transform:translateY(-1px);box-shadow:var(--sh)}
+button.p{background:linear-gradient(135deg,var(--ac),var(--ac2));border:0;color:#fff;box-shadow:0 4px 14px color-mix(in srgb,var(--ac) 40%,transparent)}
+button.d{color:var(--bad);background:transparent}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:20px;margin-bottom:16px;box-shadow:var(--sh)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row>input{flex:1 1 150px}
+.item{display:block;padding:14px;margin:0 -6px;border-radius:14px;cursor:pointer;transition:.15s}
+.item:hover{background:var(--soft)}
+.item .top{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.mut{color:var(--mut);font-size:13px}.r{text-align:right;white-space:nowrap}
+.bar{height:6px;border-radius:6px;background:var(--soft);margin-top:10px;overflow:hidden}
+.bar span{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--ac),var(--ac2))}
+.bar span.over{background:var(--bad)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:16px 0}
+.stat{background:var(--soft);border-radius:16px;padding:14px 16px;color:var(--mut);font-size:13px}
+.stat b{display:block;font-size:22px;color:var(--tx);letter-spacing:-.4px;margin-top:2px}
+.ok{color:var(--ok)}.bad{color:var(--bad)}
+.crumbs{margin-bottom:14px;color:var(--mut);font-size:14px}.crumbs a{color:var(--ac);cursor:pointer;font-weight:600}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse}td,th{padding:12px 8px;border-bottom:1px solid var(--bd);text-align:left}th{color:var(--mut);font-weight:500;font-size:12px;text-transform:uppercase;letter-spacing:.5px}tr:last-child td{border:0}
+.empty{text-align:center;color:var(--mut);padding:24px 0}
+.fl{display:inline-flex;align-items:center;gap:6px;background:var(--soft);border-radius:12px;padding:11px 14px;cursor:pointer;font-weight:600;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mod{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.8);display:flex;flex-direction:column;gap:14px;align-items:center;justify-content:center;padding:20px}
+.mod img{max-width:100%;max-height:80vh;border-radius:14px}.mod a{color:#fff;font-weight:600}
+.stat.ed{cursor:pointer;border:1.5px dashed var(--bd);transition:.15s}.stat.ed:hover{border-color:var(--ac)}
+</style></head><body>
+<header><div class="row" style="flex-wrap:nowrap"><button class="bg" data-a="menu">☰</button><h1><i>📒</i>Бухгалтерия YSD</h1></div>
+<div class="row"><span id="st" class="mut"></span><button class="p" id="sy">🔄 Синхронизировать</button><button id="cfg" title="Настройки">⚙</button><button id="exp">⬇ Сохранить файл</button><button id="imp">⬆ Загрузить файл</button><input type="file" id="file" accept=".json" hidden></div></header>
+<div class="layout"><aside id="side"></aside><main id="app"></main></div><div class="scrim" data-a="close"></div>
+<input type="file" id="af" accept="image/*,application/pdf" hidden>
+<script>
+const KEY="ysd_buh_v1",FN="Бухгалтерия YSD.json";
+let db={sections:[]},view={s:null,c:null};
+
+const uid=()=>Math.random().toString(36).slice(2,10);
+const save=()=>{store(track())};
+const fmt=n=>(Number(n)||0).toLocaleString("ru-RU",{maximumFractionDigits:2});
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const sum=a=>a.reduce((x,y)=>x+(Number(y.amount)||0),0);
+const spent=c=>sum(c.expenses),total=s=>sum(s.contracts),tspent=s=>s.contracts.reduce((x,c)=>x+spent(c),0);
+const bal=(a,b)=>`<span class="${a-b<0?'bad':'ok'}">${fmt(a-b)}</span>`;
+const have=c=>c.received==null?(+c.amount||0):(+c.received||0),totalHave=s=>s.contracts.reduce((x,c)=>x+have(c),0);
+const restCash=c=>c.cash==null?have(c)-spent(c):(+c.cash||0);
+const pg=(a,b)=>{const p=a>0?Math.min(100,b/a*100):0;return `<div class="bar"><span class="${b>a?"over":""}" style="width:${p}%"></span></div>`};
+let pend=null,attachId=null;const coll={};
+async function shrink(f){if(!f.type.startsWith("image/"))return f;try{const b=await createImageBitmap(f),k=Math.min(1,1600/Math.max(b.width,b.height)),c=document.createElement("canvas");c.width=b.width*k;c.height=b.height*k;c.getContext("2d").drawImage(b,0,0,c.width,c.height);const bl=await new Promise(r=>c.toBlob(r,"image/jpeg",.8));return new File([bl],f.name.replace(/\.\w+$/,"")+".jpg",{type:"image/jpeg"})}catch(e){return f}}
+const rd=f=>new Promise(r=>{const x=new FileReader();x.onload=()=>r(x.result);x.readAsDataURL(f)});
+function form(title,fields,ok){const m=document.createElement("div");m.className="mod";
+ m.innerHTML=`<div class="card" style="width:min(420px,100%);margin:0"><h2 style="font-size:18px">${title}</h2><div style="display:grid;gap:10px;margin:14px 0">${fields.map(f=>`<label class="mut">${f.l}<input data-k="${f.k}" type="${f.t||"text"}" value="${esc(f.v)}" style="width:100%;margin-top:4px"></label>`).join("")}</div><div class="row"><button class="p" id="ok">Сохранить</button><button id="no">Отмена</button></div></div>`;
+ m.onclick=e=>{if(e.target===m)m.remove()};m.querySelector("#no").onclick=()=>m.remove();
+ m.querySelector("#ok").onclick=()=>{const o={};m.querySelectorAll("input").forEach(i=>o[i.dataset.k]=i.value.trim());ok(o);m.remove()};
+ document.body.appendChild(m)}
+const S=()=>db.sections.find(x=>x.id===view.s),C=()=>S()?.contracts.find(x=>x.id===view.c);
+function go(s,c){view={s:s||null,c:c||null};document.body.classList.remove("open");render();scrollTo(0,0)}
+function side(){
+ const all=db.sections.reduce((x,y)=>x+total(y),0),sp=db.sections.reduce((x,y)=>x+tspent(y),0),hv=db.sections.reduce((x,y)=>x+totalHave(y),0);
+ document.getElementById("side").innerHTML=`<div class="card sbox"><div class="sh">Меню</div>
+ <a class="nv ${!view.s?"on":""}" data-a="home"><span>🏠 Обзор</span></a><div class="sh" style="margin-top:8px">Разделы</div>
+ ${db.sections.map(x=>`<a class="nv ${view.s===x.id&&!view.c?"on":""}" data-a="openS" data-id="${x.id}"><span>📁 ${esc(x.name)}</span><small>${x.contracts.length}${view.s===x.id?(coll[x.id]?" ▸":" ▾"):""}</small></a>${view.s===x.id&&!coll[x.id]?x.contracts.map(c=>`<a class="nv sub ${view.c===c.id?"on":""}" data-a="openC" data-s="${x.id}" data-id="${c.id}"><span>📄 ${esc(c.name)}</span></a>`).join(""):""}`).join("")}
+ <div class="sum" style="margin-top:auto"><div>Всего по договорам <b>${fmt(all)}</b></div><div>Наличие суммы <b>${fmt(hv)}</b></div><div>Всего расходов <b>${fmt(sp)}</b></div><div>Остаток <b>${bal(hv,sp)}</b></div><div>Наличие остатка <b>${fmt(db.sections.reduce((x,y)=>x+y.contracts.reduce((a,c)=>a+restCash(c),0),0))}</b></div></div>
+ <button class="p" data-a="newS" style="width:100%;margin-top:14px">＋ Новый раздел</button></div>`}
+function render(){
+ const app=document.getElementById("app");let h="";
+ const s=S(),c=s&&C();
+ if(!s){
+  h+=`<div class="card"><h2>Разделы</h2><div class="row" style="margin:12px 0 8px"><input id="n" placeholder="Название раздела, напр. Кыргыз комур"><button class="p" data-a="addS">Создать раздел</button></div>`;
+  h+=db.sections.length?db.sections.map(x=>`<div class="item" data-a="openS" data-id="${x.id}"><div class="top"><div><b>${esc(x.name)}</b><div class="mut">Договоров: ${x.contracts.length}</div></div><div class="r"><b>${fmt(total(x))}</b><div class="mut">расходы ${fmt(tspent(x))}</div></div></div>${pg(totalHave(x),tspent(x))}</div>`).join(""):`<div class="empty">Пока нет разделов. Создайте первый 👆</div>`;
+  h+=`</div>`;
+ }else if(!c){
+  h+=`<div class="crumbs"><a data-a="home">Разделы</a> / ${esc(s.name)}</div><div class="card"><h2>${esc(s.name)}</h2>
+  <div class="stats"><div class="stat">Сумма договоров<b>${fmt(total(s))}</b></div><div class="stat">Наличие суммы<b>${fmt(totalHave(s))}</b></div><div class="stat">Расходы<b>${fmt(tspent(s))}</b></div><div class="stat">Остаток<b>${bal(totalHave(s),tspent(s))}</b></div><div class="stat">Наличие остатка<b>${fmt(s.contracts.reduce((x,c)=>x+restCash(c),0))}</b></div></div>
+  <div class="row"><input id="n" placeholder="Название / № договора"><input id="a" type="number" placeholder="Сумма договора"><input id="r" type="number" placeholder="Наличие суммы"><button class="p" data-a="addC">Добавить договор</button></div></div>
+  <div class="card">`;
+  h+=s.contracts.length?s.contracts.map(x=>`<div class="item" data-a="openC" data-id="${x.id}"><div class="top"><div><b>${esc(x.name)}</b><div class="mut">Расходы: ${fmt(spent(x))}</div></div><div class="r"><b>${fmt(x.amount)}</b><div class="mut">наличие ${fmt(have(x))} · остаток ${bal(have(x),spent(x))}</div></div></div>${pg(have(x),spent(x))}</div>`).join(""):`<div class="empty">Договоров пока нет</div>`;
+  h+=`</div><div class="row" style="justify-content:flex-end"><button data-a="editS">✏️ Переименовать раздел</button><button class="d" data-a="delS">Удалить раздел</button></div>`;
+ }else{
+  h+=`<div class="crumbs"><a data-a="home">Разделы</a> / <a data-a="openS" data-id="${s.id}">${esc(s.name)}</a> / ${esc(c.name)}</div><div class="card"><h2>${esc(c.name)}</h2>
+  <div class="stats"><div class="stat">Сумма договора<b>${fmt(c.amount)}</b></div><div class="stat ed" data-a="qe" data-f="received">Наличие суммы ✏️<b>${fmt(have(c))}</b></div><div class="stat">Расходы<b>${fmt(spent(c))}</b></div><div class="stat">Остаток<b>${bal(have(c),spent(c))}</b></div><div class="stat ed" data-a="qe" data-f="cash">Наличие остатка ✏️<b>${fmt(restCash(c))}</b>${c.cash!=null&&restCash(c)!==have(c)-spent(c)?`<span>расхождение ${fmt(restCash(c)-(have(c)-spent(c)))}</span>`:""}</div></div>${pg(have(c),spent(c))}<div style="height:14px"></div>
+  <div class="row"><input id="n" placeholder="Название расхода"><input id="a" type="number" placeholder="Сумма"><input id="d" type="date"><label class="fl" id="fl">📎 Чек<input id="f" type="file" accept="image/*,application/pdf" hidden></label><button class="p" data-a="addE">Добавить расход</button></div></div>
+  <div class="card tw">`;
+  h+=c.expenses.length?`<table><tr><th>Дата</th><th>Расход</th><th class="r">Сумма</th><th>Чек</th><th></th></tr>${c.expenses.map(e=>`<tr><td class="mut">${esc(e.date||"")}</td><td>${esc(e.name)}</td><td class="r">${fmt(e.amount)}</td><td>${e.receipt?`<button data-a="view" data-id="${e.id}">🧾</button>`:`<button data-a="attach" data-id="${e.id}">📎</button>`}</td><td class="r"><button data-a="editE" data-id="${e.id}">✏️</button> <button class="d" data-a="delE" data-id="${e.id}">✕</button></td></tr>`).join("")}</table>`:`<div class="empty">Расходов пока нет</div>`;
+  h+=`</div><div class="row" style="justify-content:flex-end"><button data-a="editC">✏️ Изменить договор</button><button class="d" data-a="delC">Удалить договор</button></div>`;
+ }
+ app.innerHTML=h;side();
+}
+document.body.addEventListener("click",async e=>{
+ const t=e.target.closest("[data-a]");if(!t)return;
+ const a=t.dataset.a,id=t.dataset.id,v=k=>document.getElementById(k)?.value.trim();
+ if(a==="home")return go();
+ if(a==="openS"){if(view.s===id&&!view.c){coll[id]=!coll[id];return render()}delete coll[id];return go(id)}
+ if(a==="openC")return go(t.dataset.s||view.s,id);
+ if(a==="menu"){document.body.classList.toggle("open");return}
+ if(a==="close"){document.body.classList.remove("open");return}
+ if(a==="newS")return form("Новый раздел",[{k:"name",l:"Название раздела",v:""}],o=>{if(o.name){const n={id:uid(),name:o.name,contracts:[]};db.sections.push(n);save();go(n.id)}});
+ if(a==="addS"){if(!v("n"))return;db.sections.push({id:uid(),name:v("n"),contracts:[]})}
+ if(a==="addC"){if(!v("n"))return;S().contracts.push({id:uid(),name:v("n"),amount:+v("a")||0,received:v("r")===""?null:+v("r"),expenses:[]})}
+ if(a==="addE"){if(!v("n"))return;const ex={id:uid(),name:v("n"),amount:+v("a")||0,date:v("d")};if(pend){t.textContent="Загрузка…";t.disabled=true;ex.receipt=await upl(pend);pend=null}C().expenses.push(ex)}
+ if(a==="view")return show(C().expenses.find(x=>x.id===id));
+ if(a==="attach"){attachId=id;return document.getElementById("af").click()}
+ if(a==="delE"){drop(C().expenses.find(x=>x.id===id)?.receipt)}
+ if(a==="delE")C().expenses=C().expenses.filter(x=>x.id!==id);
+ if(a==="qe"){const x=C(),f=t.dataset.f,c=f==="cash";return form(c?"Наличие остатка":"Наличие суммы",[{k:"v",l:c?"Наличие остатка (пусто = авто: наличие − расходы)":"Наличие суммы (пусто = вся сумма договора)",t:"number",v:x[f]??""}],o=>{x[f]=o.v===""?null:+o.v;save();render()})}
+ if(a==="editS")return form("Раздел",[{k:"name",l:"Название",v:S().name}],o=>{if(o.name){S().name=o.name;save();render()}});
+ if(a==="editC"){const x=C();return form("Договор",[{k:"name",l:"Название / № договора",v:x.name},{k:"amount",l:"Сумма договора",t:"number",v:x.amount},{k:"received",l:"Наличие суммы (пусто = вся сумма)",t:"number",v:x.received??""},{k:"cash",l:"Наличие остатка (пусто = авто)",t:"number",v:x.cash??""}],o=>{if(o.name){x.name=o.name;x.amount=+o.amount||0;x.received=o.received===""?null:+o.received;x.cash=o.cash===""?null:+o.cash;save();render()}})}
+ if(a==="editE"){const x=C().expenses.find(y=>y.id===id);return form("Расход",[{k:"name",l:"Название расхода",v:x.name},{k:"amount",l:"Сумма",t:"number",v:x.amount},{k:"date",l:"Дата",t:"date",v:x.date||""}],o=>{if(o.name){x.name=o.name;x.amount=+o.amount||0;x.date=o.date;save();render()}})}
+ if(a==="delC"){if(!confirm("Удалить договор со всеми расходами?"))return;C().expenses.forEach(x=>drop(x.receipt));S().contracts=S().contracts.filter(x=>x.id!==view.c);view.c=null}
+ if(a==="delS"){if(!confirm("Удалить раздел со всеми договорами?"))return;S().contracts.forEach(k=>k.expenses.forEach(x=>drop(x.receipt)));db.sections=db.sections.filter(x=>x.id!==view.s);view={s:null,c:null}}
+ save();render();
+});
+document.getElementById("app").addEventListener("change",e=>{if(e.target.id==="f"){pend=e.target.files[0]||null;document.getElementById("fl").firstChild.textContent=pend?"📎 "+pend.name:"📎 Чек"}});
+document.getElementById("af").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;const x=C()?.expenses.find(y=>y.id===attachId);if(!x)return;const r=await upl(f);if(r){const o=x.receipt;x.receipt=r;if(o)drop(o);save();render()}};
+document.getElementById("exp").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(db,null,1)],{type:"application/json"}));a.download=FN;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+document.getElementById("imp").onclick=()=>document.getElementById("file").click();
+document.getElementById("file").onchange=async e=>{
+ const f=e.target.files[0];if(!f)return;
+ try{let j=JSON.parse(await f.text());if(j.db&&Array.isArray(j.db.sections))j=j.db;if(!Array.isArray(j.sections))throw 0;
+  if(confirm("Заменить текущие данные данными из файла?")){db=norm(j);view={s:null,c:null};save();render()}
+ }catch(x){alert("Не удалось прочитать файл")}
+ e.target.value="";
+};
+const CLIENT_ID="";
+const FOLDER="Бухгалтерия YSD",SCOPE="https://www.googleapis.com/auth/drive.file",K1="ysd_db2",K2="ysd_meta2",K3="ysd_cid";
+const CID=()=>CLIENT_ID||localStorage.getItem(K3)||"";
+const SEED={sections:[{id:"w2bq6y48",name:"КыргызКомур",ord:1,u:1,contracts:[{id:"tzuxe5cf",u:1,name:"ДОГОВОР № ______________ на разработку и внедрение автоматизированной системы управления площадки угольного разреза «Кара-Кече»",amount:9100000,expenses:[]}]}],del:{}};
+let meta={dirty:false,last:0,authed:false,pdel:[]},known={},knownRec={},tok=null,tokExp=0,syncing=false,tcli=null,tcb={};
+//#MERGE-START
+function norm(d){
+ d=d&&Array.isArray(d.sections)?d:{sections:[]};
+ d.del=d.del&&typeof d.del==="object"?d.del:{};
+ d.sections.forEach((s,i)=>{if(s.u==null)s.u=1;if(s.ord==null)s.ord=i+1;s.contracts=s.contracts||[];
+  s.contracts.forEach(c=>{if(c.u==null)c.u=1;c.expenses=c.expenses||[];c.expenses.forEach(e=>{if(e.u==null)e.u=1})})});
+ return d}
+function walk(cb){db.sections.forEach(s=>{cb(s,"s");s.contracts.forEach(c=>{cb(c,"c");c.expenses.forEach(e=>cb(e,"e"))})})}
+function own(x,k){return JSON.stringify(k==="s"?[x.name,x.ord]:k==="c"?[x.name,x.amount,x.received,x.cash]:[x.name,x.amount,x.date,x.receipt?(x.receipt.fid||x.receipt.lid||x.receipt.id||"d"):null])}
+function resetKnown(){known={};knownRec={};walk((x,k)=>{known[x.id]=own(x,k);if(k==="e")knownRec[x.id]=x.receipt?{fid:x.receipt.fid||null}:null})}
+function track(){
+ const now=Date.now(),cur={},curRec={};let ch=false,n=0;
+ db.sections.forEach((s,i)=>{if(s.ord==null)s.ord=now+i});
+ walk((x,k)=>{const o=own(x,k);
+  if(known[x.id]!==o){x.u=now;ch=true;if(known[x.id]===undefined&&x.c==null)x.c=now+(n++)}
+  cur[x.id]=o;if(k==="e")curRec[x.id]=x.receipt?{fid:x.receipt.fid||null}:null});
+ Object.keys(known).forEach(id=>{if(!(id in cur)){db.del[id]=now;ch=true}});
+ Object.keys(knownRec).forEach(id=>{const p=knownRec[id],c=curRec[id];if(p&&p.fid&&(!c||c.fid!==p.fid))meta.pdel.push(p.fid)});
+ known=cur;knownRec=curRec;return ch}
+function mergeLists(a,b,mf){
+ const m=new Map();(a||[]).forEach(x=>m.set(x.id,x));
+ (b||[]).forEach(y=>{const x=m.get(y.id);m.set(y.id,x?mf(x,y):y)});
+ return [...m.values()].sort((p,q)=>(p.c||0)-(q.c||0))}
+function mergeEnt(x,y,kind){
+ const r=Object.assign({},(y.u||0)>(x.u||0)?y:x);
+ if(kind==="s")r.contracts=mergeLists(x.contracts,y.contracts,(p,q)=>mergeEnt(p,q,"c"));
+ if(kind==="c")r.expenses=mergeLists(x.expenses,y.expenses,(p,q)=>mergeEnt(p,q,"e"));
+ r.u=Math.max(x.u||0,y.u||0);return r}
+function mergeDb(a,b){
+ a=norm(a);b=norm(b);
+ const del=Object.assign({},a.del);Object.keys(b.del).forEach(k=>{del[k]=Math.max(del[k]||0,b.del[k])});
+ const alive=x=>!(del[x.id]>=(x.u||0));
+ const secs=mergeLists(a.sections,b.sections,(p,q)=>mergeEnt(p,q,"s")).sort((p,q)=>(p.ord||0)-(q.ord||0)||(p.id<q.id?-1:1));
+ const out=secs.filter(alive).map(s=>Object.assign({},s,{contracts:s.contracts.filter(alive).map(c=>Object.assign({},c,{expenses:c.expenses.filter(alive)}))}));
+ return {sections:out,del}}
+//#MERGE-END
+const idb=new Promise(r=>{try{const q=indexedDB.open("ysd",1);q.onupgradeneeded=()=>q.result.createObjectStore("b");q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)}catch(e){r(null)}});
+const idbp=async(mode,fn)=>{const d=await idb;if(!d)return null;return new Promise(res=>{try{const t=d.transaction("b",mode),rq=fn(t.objectStore("b"));t.oncomplete=()=>res(rq&&rq.result!==undefined?rq.result:null);t.onerror=t.onabort=()=>res(null)}catch(e){res(null)}})};
+const idbGet=k=>k?idbp("readonly",s=>s.get(k)):null,idbPut=(k,v)=>idbp("readwrite",s=>s.put(v,k)),idbDel=k=>k?idbp("readwrite",s=>s.delete(k)):null;
+try{meta=Object.assign(meta,JSON.parse(localStorage.getItem(K2)||"{}"))}catch(e){}
+try{const t=localStorage.getItem(K1);db=t?JSON.parse(t):JSON.parse(JSON.stringify(SEED))}catch(e){db=JSON.parse(JSON.stringify(SEED))}
+db=norm(db);resetKnown();
+function store(ch){if(ch)meta.dirty=true;try{localStorage.setItem(K1,JSON.stringify(db));localStorage.setItem(K2,JSON.stringify(meta))}catch(e){stat("⚠ Не удалось сохранить на устройстве","bad");return}refreshStat()}
+function stat(t,c){const e=document.getElementById("st");if(e){e.textContent=t;e.className="mut "+(c||"")}}
+function refreshStat(){
+ if(syncing)return;
+ const d=meta.last?new Date(meta.last).toLocaleString("ru-RU",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):"";
+ if(meta.dirty)stat("● Есть несинхронизированные изменения"+(d?" · синхр. "+d:""),"bad");
+ else stat(meta.last?"✔ Синхронизировано "+d:"Ещё не синхронизировано")}
+async function upl(f){
+ f=await shrink(f);const lid=uid();
+ if(await idbPut(lid,f)!==null)return{lid,fid:null,type:f.type,name:f.name};
+ if(f.size>1.5e6){alert("Не удалось сохранить файл на устройстве, а он слишком большой");return null}
+ return{data:await rd(f),type:f.type,name:f.name}}
+async function drop(r){if(r){await idbDel(r.lid);await idbDel(r.fid)}}
+const gis=()=>new Promise((res,rej)=>{if(window.google&&google.accounts)return res();
+ const s=document.createElement("script");s.src="https://accounts.google.com/gsi/client";
+ s.onload=()=>res();s.onerror=()=>rej(new Error("Не удалось загрузить Google (нет интернета?)"));document.head.appendChild(s)});
+async function getToken(){
+ if(tok&&Date.now()<tokExp-60000)return tok;
+ if(!CID())throw new Error("Не указан Google Client ID (кнопка ⚙)");
+ await gis();
+ return new Promise((res,rej)=>{
+  tcb={res,rej};
+  if(!tcli)tcli=google.accounts.oauth2.initTokenClient({client_id:CID(),scope:SCOPE,
+   callback:r=>{if(r.error)tcb.rej(new Error(r.error_description||r.error));else{tok=r.access_token;tokExp=Date.now()+(+r.expires_in||3600)*1000;meta.authed=true;tcb.res(tok)}},
+   error_callback:e=>tcb.rej(new Error(e.type==="popup_closed"?"Окно входа Google закрыто":e.type==="popup_failed_to_open"?"Браузер заблокировал окно входа Google":e.type||"Ошибка входа"))});
+  tcli.requestAccessToken({prompt:meta.authed?"":"consent"})})}
+async function gfetch(path,opt){
+ const url=path.startsWith("http")?path:"https://www.googleapis.com/drive/v3/"+path;
+ const r=await fetch(url,Object.assign({},opt,{headers:Object.assign({Authorization:"Bearer "+tok},(opt&&opt.headers)||{})}));
+ if(!r.ok){if(r.status===401)tok=null;const e=new Error("Google Drive вернул ошибку "+r.status);e.status=r.status;throw e}
+ return r}
+const gj=async p=>(await gfetch(p)).json();
+async function ensureFolder(){
+ const q="name='"+FOLDER+"' and mimeType='application/vnd.google-apps.folder' and trashed=false";
+ const l=await gj("files?q="+encodeURIComponent(q)+"&fields=files(id)&orderBy=createdTime");
+ if(l.files.length)return l.files[0].id;
+ const r=await gfetch("files?fields=id",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({name:FOLDER,mimeType:"application/vnd.google-apps.folder"})});
+ return (await r.json()).id}
+async function gUpload(name,blob,parent,existing){
+ const f=new FormData();
+ f.append("metadata",new Blob([JSON.stringify(existing?{name}:{name,parents:[parent]})],{type:"application/json"}));
+ f.append("file",blob);
+ const r=await gfetch("https://www.googleapis.com/upload/drive/v3/files"+(existing?"/"+existing:"")+"?uploadType=multipart&fields=id",{method:existing?"PATCH":"POST",body:f});
+ return (await r.json()).id}
+const extOf=n=>((n||"").match(/\.\w{1,5}$/)||[""])[0];
+async function getBlob(r){
+ if(r.data){return await (await fetch(r.data)).blob()}
+ for(const k of [r.lid,r.fid]){const b=await idbGet(k);if(b)return b}
+ if(!r.fid)return null;
+ await getToken();
+ const b=await (await gfetch("files/"+r.fid+"?alt=media")).blob();
+ const t=new Blob([b],{type:r.type||b.type});await idbPut(r.fid,t);return t}
+async function show(x){
+ const r=x.receipt;stat("Загрузка чека…");let b=null;
+ try{b=await getBlob(r)}catch(e){alert("Не удалось получить чек: "+e.message)}
+ refreshStat();
+ const u=b?URL.createObjectURL(b):"",ty=(b&&b.type)||r.type||"",m=document.createElement("div");m.className="mod";
+ m.innerHTML=(b?(ty.startsWith("image/")?`<img src="${u}">`:`<a href="${u}" target="_blank" rel="noopener">Открыть: ${esc(r.name)}</a>`):`<div style="color:#fff;text-align:center;max-width:320px">Чек недоступен на этом устройстве. Нажмите «Синхронизировать» или прикрепите чек заново.</div>`)+`<div class="row"><button id="rp">Заменить чек</button><button class="d" id="rm">Удалить чек</button><button>Закрыть</button></div>`;
+ m.onclick=()=>{if(u)URL.revokeObjectURL(u);m.remove()};
+ m.querySelector("#rp").onclick=()=>{attachId=x.id;document.getElementById("af").click()};
+ m.querySelector("#rm").onclick=async ev=>{ev.stopPropagation();if(!confirm("Удалить чек?"))return;await drop(r);x.receipt=null;save();render();m.remove()};
+ document.body.appendChild(m)}
+async function sync(){
+ if(syncing)return;
+ if(!CID()){alert("Сначала укажите Google Client ID (кнопка ⚙).");return cfgForm()}
+ if(!navigator.onLine){stat("⚠ Нет интернета","bad");return}
+ syncing=true;document.getElementById("sy").disabled=true;
+ const ov=document.createElement("div");ov.className="mod";
+ ov.innerHTML='<div class="card" style="margin:0;text-align:center"><b>🔄 Синхронизация…</b><div class="mut" style="margin-top:6px">Не закрывайте страницу</div></div>';
+ document.body.appendChild(ov);
+ try{
+  stat("🔄 Вход в Google…");await getToken();
+  stat("🔄 Синхронизация…");
+  track();
+  const folder=await ensureFolder();
+  const q="'"+folder+"' in parents and name='ysd-data.json' and trashed=false";
+  const l=await gj("files?q="+encodeURIComponent(q)+"&fields=files(id)&orderBy=createdTime");
+  const fileId=l.files[0]&&l.files[0].id;let remote={sections:[],del:{}};
+  if(fileId)remote=norm(await (await gfetch("files/"+fileId+"?alt=media")).json());
+  const merged=mergeDb(db,remote);let warn=0;
+  for(const s of merged.sections)for(const c of s.contracts)for(const e of c.expenses){
+   const r=e.receipt;
+   if(r&&r.lid&&!r.fid){const bl=await idbGet(r.lid);if(!bl)continue;
+    try{r.fid=await gUpload("ysd-receipt-"+r.lid+extOf(r.name),bl,folder);e.u=Date.now()}catch(x){warn++}}}
+  const keep=[];
+  for(const id of meta.pdel){try{await gfetch("files/"+id,{method:"DELETE"})}catch(e){if(e.status!==404)keep.push(id)}}
+  meta.pdel=keep;
+  await gUpload("ysd-data.json",new Blob([JSON.stringify(merged)],{type:"application/json"}),folder,fileId);
+  db=norm(merged);resetKnown();meta.dirty=false;meta.last=Date.now();
+  syncing=false;store(false);render();
+  if(warn)stat("⚠ Данные синхронизированы, но "+warn+" чек(ов) не загрузились — повторите","bad")
+ }catch(e){
+  syncing=false;
+  alert("Синхронизация не удалась: "+(e&&e.message||e));stat("⚠ Синхронизация не удалась","bad")
+ }finally{syncing=false;ov.remove();document.getElementById("sy").disabled=false;if(!document.getElementById("st").className.includes("bad"))refreshStat()}}
+function cfgForm(){form("Настройки Google",[{k:"cid",l:"Google Client ID (оканчивается на .apps.googleusercontent.com)",v:CID()}],o=>{localStorage.setItem(K3,o.cid);refreshStat()})}
+document.getElementById("sy").onclick=sync;
+document.getElementById("cfg").onclick=cfgForm;
+window.addEventListener("online",refreshStat);window.addEventListener("offline",()=>stat("Нет интернета: работаете офлайн","bad"));
+if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+gis().catch(()=>{});
+render();refreshStat();
+</script></body></html>
