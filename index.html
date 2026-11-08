@@ -443,10 +443,25 @@ function settingsMenu(){
  m.querySelector("#s2").onclick=()=>{m.remove();cfgForm()};
  m.querySelector("#s3").onclick=()=>m.remove();
  document.body.appendChild(m)}
+let gtok=null,gexp=0,gcli=null,gcb={};
+function getGmailToken(){
+ if(gtok&&Date.now()<gexp-60000)return Promise.resolve(gtok);
+ return gis().then(()=>new Promise((res,rej)=>{gcb={res,rej};
+  if(!gcli)gcli=google.accounts.oauth2.initTokenClient({client_id:CID(),scope:"https://www.googleapis.com/auth/gmail.send",
+   callback:r=>{if(r.error)gcb.rej(new Error(r.error_description||r.error));else{gtok=r.access_token;gexp=Date.now()+(+r.expires_in||3600)*1000;gcb.res(gtok)}},
+   error_callback:e=>gcb.rej(new Error(e.type==="popup_closed"?"окно входа Google закрыто":e.type==="popup_failed_to_open"?"браузер заблокировал окно входа":e.type||"ошибка входа"))});
+  gcli.requestAccessToken({prompt:meta.gm?"":"consent"})}))}
+const b64=s=>{let bin="";new TextEncoder().encode(s).forEach(x=>{bin+=String.fromCharCode(x)});return btoa(bin)};
+async function sendInvite(em,subject,text){
+ const tk=await getGmailToken();
+ const raw=["To: "+em,"Subject: =?UTF-8?B?"+b64(subject)+"?=","MIME-Version: 1.0","Content-Type: text/plain; charset=UTF-8","Content-Transfer-Encoding: base64","",b64(text).replace(/.{76}/g,"$&\r\n")].join("\r\n");
+ const r=await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send",{method:"POST",headers:{Authorization:"Bearer "+tk,"content-type":"application/json"},body:JSON.stringify({raw:b64(raw).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")})});
+ if(!r.ok){gtok=null;throw new Error("Gmail вернул ошибку "+r.status+(r.status===403?" (включите Gmail API и разрешение gmail.send в Google Cloud)":""))}
+ meta.gm=true;store(false)}
 const appLink=()=>location.href.split(/[?#]/)[0];
-function inviteDialog(em,text){
+function inviteDialog(em,text,err){
  const m=document.createElement("div");m.className="mod";
- m.innerHTML=`<div class="card" style="margin:0;width:min(460px,100%)"><h2 style="font-size:18px">Доступ открыт</h2><div class="mut" style="margin:4px 0 10px">Отправьте участнику это приглашение. Письмо с файлом от Google не отправлялось.</div><textarea id="it" readonly style="width:100%;min-height:170px;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:6px;padding:10px;font:inherit;font-size:13px"></textarea><div class="row" style="margin-top:12px"><button class="p" id="ic">Копировать</button><button id="im">✉ Написать письмо</button><button id="id">Готово</button></div></div>`;
+ m.innerHTML=`<div class="card" style="margin:0;width:min(460px,100%)"><h2 style="font-size:18px">Доступ открыт</h2><div class="mut" style="margin:4px 0 10px">${err?"Автоматически отправить не удалось ("+esc(err)+"). ":""}Отправьте участнику это приглашение вручную. Письмо с файлом от Google не отправлялось.</div><textarea id="it" readonly style="width:100%;min-height:170px;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:6px;padding:10px;font:inherit;font-size:13px"></textarea><div class="row" style="margin-top:12px"><button class="p" id="ic">Копировать</button><button id="im">✉ Написать письмо</button><button id="id">Готово</button></div></div>`;
  const ta=m.querySelector("#it");ta.value=text;
  m.querySelector("#ic").onclick=async()=>{try{await navigator.clipboard.writeText(text)}catch(e){ta.select();try{document.execCommand("copy")}catch(x){}}m.querySelector("#ic").textContent="Скопировано ✓"};
  m.querySelector("#im").onclick=()=>{location.href="mailto:"+encodeURIComponent(em)+"?subject="+encodeURIComponent("Доступ к «Бухгалтерия YSD»")+"&body="+encodeURIComponent(text)};
@@ -480,7 +495,9 @@ async function peopleModal(){
    try{
     const post=n=>gfetch("files/"+f+"/permissions?sendNotificationEmail="+n+(n?"&emailMessage="+encodeURIComponent(txt):""),{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({type:"user",role,emailAddress:em})});
     try{await post(false)}catch(e){if(e.status===403)throw e;await post(true);notice("Google отправил участнику письмо с приглашением, в нём указана ссылка на приложение.");draw();return}
-    draw();inviteDialog(em,txt)
+    draw();
+    try{await sendInvite(em,"Доступ к «Бухгалтерия YSD»",txt);notice("Приглашение со ссылкой на приложение отправлено на "+em+" ("+ROLE_NAME[role]+")")}
+    catch(e){inviteDialog(em,txt,e&&e.message||String(e))}
    }catch(e){notice("Не удалось пригласить: "+e.message+(e.status===403?" (нет прав делиться этой папкой)":""))}}};
  draw()}
 function cfgForm(){
