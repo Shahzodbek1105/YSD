@@ -443,6 +443,15 @@ function settingsMenu(){
  m.querySelector("#s2").onclick=()=>{m.remove();cfgForm()};
  m.querySelector("#s3").onclick=()=>m.remove();
  document.body.appendChild(m)}
+const appLink=()=>location.href.split(/[?#]/)[0];
+function inviteDialog(em,text){
+ const m=document.createElement("div");m.className="mod";
+ m.innerHTML=`<div class="card" style="margin:0;width:min(460px,100%)"><h2 style="font-size:18px">Доступ открыт</h2><div class="mut" style="margin:4px 0 10px">Отправьте участнику это приглашение. Письмо с файлом от Google не отправлялось.</div><textarea id="it" readonly style="width:100%;min-height:170px;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:6px;padding:10px;font:inherit;font-size:13px"></textarea><div class="row" style="margin-top:12px"><button class="p" id="ic">Копировать</button><button id="im">✉ Написать письмо</button><button id="id">Готово</button></div></div>`;
+ const ta=m.querySelector("#it");ta.value=text;
+ m.querySelector("#ic").onclick=async()=>{try{await navigator.clipboard.writeText(text)}catch(e){ta.select();try{document.execCommand("copy")}catch(x){}}m.querySelector("#ic").textContent="Скопировано ✓"};
+ m.querySelector("#im").onclick=()=>{location.href="mailto:"+encodeURIComponent(em)+"?subject="+encodeURIComponent("Доступ к «Бухгалтерия YSD»")+"&body="+encodeURIComponent(text)};
+ m.querySelector("#id").onclick=()=>m.remove();
+ document.body.appendChild(m)}
 async function peopleModal(){
  if(!CID()){notice("Сначала укажите Google Client ID (⚙ → Вход, пароль и Google Client ID)");return}
  if(!navigator.onLine){notice("Нет интернета");return}
@@ -467,9 +476,12 @@ async function peopleModal(){
   m.querySelector("#pa").onclick=async()=>{
    const em=m.querySelector("#pe").value.trim(),role=m.querySelector("#pr").value;
    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){notice("Введите корректный email");return}
-   try{await gfetch("files/"+f+"/permissions?sendNotificationEmail=true&emailMessage="+encodeURIComponent("Вам открыт доступ к учёту «Бухгалтерия YSD». Откройте страницу приложения и нажмите «Синхронизировать»."),{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({type:"user",role,emailAddress:em})});
-    notice("Приглашение отправлено на "+em+" ("+ROLE_NAME[role]+")");draw()}
-   catch(e){notice("Не удалось пригласить: "+e.message+(e.status===403?" (нет прав делиться этой папкой)":""))}}};
+   const txt="Вам открыт доступ к учёту «Бухгалтерия YSD» (роль: "+ROLE_NAME[role]+").\n\nСсылка на приложение:\n"+appLink()+"\n\nКак войти:\n1. Откройте ссылку и придумайте логин и пароль для этого устройства.\n2. Нажмите «Синхронизировать» и войдите в Google-аккаунт "+em+".\n3. Если Google покажет предупреждение «приложение не проверено», нажмите «Дополнительно» и «Перейти».";
+   try{
+    const post=n=>gfetch("files/"+f+"/permissions?sendNotificationEmail="+n+(n?"&emailMessage="+encodeURIComponent(txt):""),{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({type:"user",role,emailAddress:em})});
+    try{await post(false)}catch(e){if(e.status===403)throw e;await post(true);notice("Google отправил участнику письмо с приглашением, в нём указана ссылка на приложение.");draw();return}
+    draw();inviteDialog(em,txt)
+   }catch(e){notice("Не удалось пригласить: "+e.message+(e.status===403?" (нет прав делиться этой папкой)":""))}}};
  draw()}
 function cfgForm(){
  const a=getAuth();
