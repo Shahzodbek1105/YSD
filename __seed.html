@@ -1,0 +1,9 @@
+<!doctype html><meta charset="utf-8"><script>
+(async()=>{
+sessionStorage.setItem('ysd_unlocked','1');localStorage.setItem('ysd_auth',JSON.stringify({u:'t',salt:'x',alg:'p',hash:'x'}));
+const j=await (await fetch("__test_import.json",{cache:"no-store"})).json();
+j.sections.push({id:"s2",name:"Очень длинное название раздела для проверки переноса строк",contracts:[{id:"c9",name:"Договор №2024/11-ОЧЕНЬДЛИННЫЙНОМЕРДОГОВОРАБЕЗПРОБЕЛОВ",amount:123456789,received:98765432,expenses:[{id:"x1",name:"Расход",amount:5}]}]});
+localStorage.setItem('ysd_db2',JSON.stringify(j));localStorage.setItem('ysd_meta2',JSON.stringify({dirty:true,last:Date.now()}));
+location.replace("./");
+})();
+</script>
